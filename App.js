@@ -1,70 +1,48 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+
 class App extends React.Component {
     constructor(){
         super();
         this.state = {
-            red: 0
+            input: '/* add your jsx here */',
+            output: '',
+            err: ''
         }
-        this.update = this.update.bind(this)
+        this.update = this.update.bind(this);
     }
+
     update(e){
-        this.setState({
-            red: ReactDOM.findDOMNode(this.refs.red.refs.inp).value
-        })
+        let code = e.target.value;
+        try{
+            this.setState({
+                output: babel.transform(code, {
+                    stage: 0,
+                    loose: 'all'
+                }).code,
+                err: ''
+            })
+        }
+        catch (err){
+            this.setState({err: err.message})
+        }
     }
-    render(){
-        return (
+
+    render() {
+        return(
             <div>
-                <NumInput ref="red"
-                          min={0}
-                          max={255}
-                          step={.5}
-                          val={+this.state.red}
-                          label="Red"
-                          type="number"
-                          update={this.update} />
+                <header>{this.state.err}</header>
+                <div className="container">
+                    <textarea
+                    onChange={this.update}
+                    defaultValue={this.state.input}>
+                    </textarea>
+                    <pre>
+                        {this.state.output}
+                    </pre>
+                </div>
             </div>
-        );
+        )
     }
-}
-
-class NumInput extends React.Component {
-    render(){
-        let label = this.props.label !== '' ?
-            <label>{this.props.label} - {this.props.val}</label> : ''
-        return (
-            <div>
-                <input ref="inp"
-                       type={this.props.type}
-                       min={this.props.min}
-                       max={this.props.max}
-                       step={this.props.step}
-                       defaultValue={this.props.val}
-                       onChange={this.props.update} />
-                {label}
-            </div>
-        );
-    }
-}
-
-NumInput.propTypes = {
-    min: React.PropTypes.number,
-    max: React.PropTypes.number,
-    step: React.PropTypes.number,
-    val: React.PropTypes.number,
-    label: React.PropTypes.string,
-    update: React.PropTypes.func.isRequired,
-    type: React.PropTypes.oneOf(['number','range'])
-}
-
-NumInput.defaultProps = {
-    min: 0,
-    max: 0,
-    step: 1,
-    val: 1,
-    label: '',
-    type: 'range'
 }
 
 
